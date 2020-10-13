@@ -16,7 +16,6 @@ Visite orfanatos e mude o dia de muitas crianças.
 # Tecnologias Utilizadas 🚀
 React ⚛️ <br />
 React Router ⚛️ <br />
-React Icons ⚛️ <br />
 Typescript 🦕
 
 # Como obter esse repositório?
