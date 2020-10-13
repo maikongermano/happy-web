@@ -10,7 +10,7 @@ Uma aplicação que irá ajudar a encontrar orfanatos próximos.
 Visite orfanatos e mude o dia de muitas crianças.
 
 <p align="center">
-  <img src="./src/images/logo.svg" />
+  <img src="./src/images/landing.svg" />
 </p>
 
 # Tecnologias Utilizadas 🚀
