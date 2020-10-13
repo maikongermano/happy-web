@@ -7,7 +7,7 @@ import Logo from '../images/logo.svg'
 
 function Landing() {
     return (
-        <div id="page-landing">
+      <div id="page-landing">
       <div className="content-wrapper">
         <img src={Logo} alt="Happy"/>
 
