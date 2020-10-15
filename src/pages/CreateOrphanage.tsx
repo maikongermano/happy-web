@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState, ChangeEvent } from "react";
+import { useHistory } from "react-router-dom";
 import { Map, Marker, TileLayer } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet'
+import api from "../services/api";
 
 import {  FiPlus } from "react-icons/fi";
 import Sidebar from "../components/Sidebar";
@@ -10,10 +12,23 @@ import '../styles/pages/create-orphanage.css';
 
 
 
+
+
 export default function CreateOrphanage() {
+  const history = useHistory();
 
   const [position, setPosition] = useState({ latitude:0 , longitude: 0 })
 
+  const [name, setName] = useState('');
+  const [about, setAbout] = useState('');
+  const [instruction, setInstruction] = useState('');
+  const [opening_hours, setOpeningHours] = useState('');
+  const [open_on_weekends, setOpenOnWeekends] = useState(true);
+  const [images, setImages] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  
+
+  // função controla clique do mapa
   function handleMapClick(event: LeafletMouseEvent) {
     const { lat, lng } = event.latlng;
 
@@ -24,12 +39,62 @@ export default function CreateOrphanage() {
 
   }
 
+  // dados formulario
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+
+    const { latitude, longitude } = position
+
+    const data = new FormData();
+
+    // enviando os dados
+    data.append('name', name);
+    data.append('about', about);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('instruction', instruction);
+    data.append('opening_hours', opening_hours);
+    data.append('open_on_weekends', String(open_on_weekends));
+    
+    // enviando as imagens
+    images.forEach(image => {
+      data.append('images', image);
+    })
+
+    // cadastrando orfanato
+    await api.post('orphanages', data);
+
+    alert('Cadastro realizado com sucesso!')
+
+    // enviando usuário para tela mapa
+    history.push('/app')
+  }
+
+  // seleção de images
+  function handleSelectImage(event: ChangeEvent<HTMLInputElement>) {
+    // caso nao houver seleçã de imagens
+    if (!event.target.files) {
+      return;
+    }
+
+    const selectImages = Array.from(event.target.files)
+
+    setImages(selectImages);
+
+    const selectImagesPreview = selectImages.map(image => {
+      return URL.createObjectURL(image)
+    });
+
+    setPreviewImages(selectImagesPreview)
+    
+  }
+
   return (
     <div id="page-create-orphanage">
       <Sidebar />
 
       <main>
-        <form className="create-orphanage-form">
+        <form onSubmit={handleSubmit} className="create-orphanage-form">
           <fieldset>
             <legend>Dados</legend>
 
@@ -62,24 +127,38 @@ export default function CreateOrphanage() {
 
             <div className="input-block">
               <label htmlFor="name">Nome</label>
-              <input id="name" />
+              <input 
+                id="name" 
+                value={name} 
+                onChange={event => setName(event.target.value)}
+              />
             </div>
 
             <div className="input-block">
               <label htmlFor="about">Sobre <span>Máximo de 300 caracteres</span></label>
-              <textarea id="name" maxLength={300} />
+              <textarea 
+                id="about"
+                value={about} 
+                maxLength={300} 
+                onChange={event => setAbout(event.target.value)}
+              />
             </div>
 
             <div className="input-block">
               <label htmlFor="images">Fotos</label>
 
-              <div className="uploaded-image">
-
+              <div className="image-container">
+                {previewImages.map(image => {
+                  return (
+                    <img key={image} src={image} alt={name}/>
+                  )
+                })}
+                <label htmlFor="image[]" className="new-image">
+                  <FiPlus size={24} color="#15b6d6" />
+                </label>
               </div>
+              <input multiple onChange={handleSelectImage} type="file" id="image[]"/>
 
-              <button className="new-image">
-                <FiPlus size={24} color="#15b6d6" />
-              </button>
             </div>
           </fieldset>
 
@@ -88,20 +167,40 @@ export default function CreateOrphanage() {
 
             <div className="input-block">
               <label htmlFor="instructions">Instruções</label>
-              <textarea id="instructions" />
+              <textarea 
+                id="instructions" 
+                value={instruction}
+                onChange={event => setInstruction(event.target.value)}
+              />
             </div>
 
             <div className="input-block">
-              <label htmlFor="opening_hours">Nome</label>
-              <input id="opening_hours" />
+              <label htmlFor="opening_hours">Horário de funcionamento</label>
+              <input 
+                id="opening_hours" 
+                value={opening_hours}
+                onChange={event => setOpeningHours(event.target.value)}
+              />
             </div>
 
             <div className="input-block">
               <label htmlFor="open_on_weekends">Atende fim de semana</label>
 
               <div className="button-select">
-                <button type="button" className="active">Sim</button>
-                <button type="button">Não</button>
+                <button 
+                  type="button" 
+                  className={open_on_weekends ? 'active' : ''}
+                  onClick={() => setOpenOnWeekends(true)}
+                >
+                  Sim
+                </button>
+                <button 
+                  type="button"
+                  className={!open_on_weekends ? 'active' : ''}
+                  onClick={() => setOpenOnWeekends(false)}
+                >
+                  Não
+                </button>
               </div>
             </div>
           </fieldset>
