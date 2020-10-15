@@ -2,11 +2,12 @@ import React, { FormEvent, useState, ChangeEvent } from "react";
 import { useHistory } from "react-router-dom";
 import { Map, Marker, TileLayer } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet'
-import api from "../services/api";
+
 
 import {  FiPlus } from "react-icons/fi";
 import Sidebar from "../components/Sidebar";
 import mapIcon from "../utils/mapIcons";
+import api from "../services/api";
 
 import '../styles/pages/create-orphanage.css';
 
@@ -49,10 +50,10 @@ export default function CreateOrphanage() {
 
     // enviando os dados
     data.append('name', name);
-    data.append('about', about);
     data.append('latitude', String(latitude));
     data.append('longitude', String(longitude));
-    data.append('instruction', instruction);
+    data.append('about', about);
+    data.append('instructions', instruction);
     data.append('opening_hours', opening_hours);
     data.append('open_on_weekends', String(open_on_weekends));
     
@@ -62,6 +63,8 @@ export default function CreateOrphanage() {
     })
 
     // cadastrando orfanato
+    console.log(name);
+    console.log(data)
     await api.post('orphanages', data);
 
     alert('Cadastro realizado com sucesso!')
@@ -99,7 +102,7 @@ export default function CreateOrphanage() {
             <legend>Dados</legend>
 
             <Map 
-              center={[-27.2092052,-49.6401092]} 
+              center={[-23.5703901,-51.462465]} 
               style={{ width: '100%', height: 280 }}
               zoom={15}
               onclick={handleMapClick}
