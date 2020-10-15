@@ -63,8 +63,6 @@ export default function CreateOrphanage() {
     })
 
     // cadastrando orfanato
-    console.log(name);
-    console.log(data)
     await api.post('orphanages', data);
 
     alert('Cadastro realizado com sucesso!')
